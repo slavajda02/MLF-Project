@@ -77,3 +77,7 @@ cython_debug/
 
 # Local IDE settings
 .idea/
+
+# Project related files
+MPA-MLF_data.zip
+Dataset

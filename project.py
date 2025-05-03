@@ -17,7 +17,7 @@ api.authenticate()
 #TensorFlow imports
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam, Adamax
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.layers import InputLayer, Conv2D, MaxPooling2D, Flatten, Dense, Dropout, AveragePooling2D, BatchNormalization
 from tensorflow.keras.applications import MobileNetV3Small, MobileNetV3Large
@@ -73,25 +73,28 @@ print('Testing input:', test.shape)
 #Convolutional Neural Network
 model = Sequential([
     InputLayer(input_shape=(72, 48, 1)),
-    Conv2D(16, (4, 2), activation='relu'),
+    Conv2D(32, (4, 3), activation='relu', padding='same'),
+    BatchNormalization(), 
     MaxPooling2D((2, 2)),
     
-    Conv2D(32, (4, 2), activation='relu'),
+    Conv2D(64, (4, 3), activation='relu', padding='same'),
+    BatchNormalization(), 
     MaxPooling2D((2, 2)),
+    
     Flatten(),
     
-    Dense(128, activation='relu'),
     Dense(64, activation='relu'),
-    Dropout(0.2),
+    Dropout(0.3),
+    Dense(32, activation='relu'),
     
     Dense(3, activation='softmax'),
 ])
 
-batch_size = 8
+batch_size = 6
 n_of_epochs = 100
 lr_reducer = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=4, min_lr=1e-6, verbose=1)
-early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True, verbose=1)
-optim = Adam(learning_rate=0.001)
+early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True, verbose=1)
+optim = Adamax(learning_rate=0.001)
 
 model.compile(optimizer=optim, loss='categorical_crossentropy', metrics=['accuracy'])
 model.summary()
